@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable, one_member_abstracts
+// ignore_for_file: unused_local_variable, dead_code
 
 void miscDeclAnalyzedButNotTested() {
   (bool done, int col) {
@@ -45,25 +45,25 @@ void miscDeclAnalyzedButNotTested() {
 
 // Minimal class definitions in support of nested-cascades
 
-abstract class Builder<T> {
+mixin Builder<T> {
   T build();
 }
 
 class PhoneNumber {
-  String number, label;
+  String number = '', label = '';
 }
 
 class PhoneNumberBuilder extends PhoneNumber with Builder<PhoneNumber> {
   @override
-  PhoneNumber build() => null;
+  PhoneNumber build() => PhoneNumber();
 }
 
 class AddressBook {
-  String name, email;
-  PhoneNumber phone;
+  String name = '', email = '';
+  PhoneNumber phone = PhoneNumber();
 }
 
 class AddressBookBuilder extends AddressBook with Builder<AddressBook> {
   @override
-  AddressBook build() => null;
+  AddressBook build() => AddressBook();
 }

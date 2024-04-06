@@ -1,20 +1,23 @@
 // ignore_for_file: unused_import
 import 'dart:io';
+
 // #docregion import
 // Importing core libraries
 import 'dart:math';
 
 // Importing libraries from external packages
 import 'package:test/test.dart';
+
 // #enddocregion import
 import 'package:examples_util/print_matcher.dart' as m;
 import 'package:examples/samples/spacecraft.dart';
-// #docregion import
 
+// #docregion import
 // Importing files
 import 'path/to/my_other_file.dart';
 // #enddocregion import
 
+// ignore: strict_raw_type
 Iterable flatten(Iterable it) => it.expand((e) => e is Iterable ? e : [e]);
 
 void main() {
@@ -46,14 +49,14 @@ void main() {
     // #enddocregion var
 
     test('var', () {
-      expect(flybyObjects, TypeMatcher<List>());
-      expect(image, TypeMatcher<Map>());
+      expect(flybyObjects, TypeMatcher<List<String>>());
+      expect(image, TypeMatcher<Map<String, dynamic>>());
       expect(
           name.length > antennaDiameter, isTrue); // avoid unused_local_variable
     });
 
     test('Control flow', () {
-      void _test() {
+      void testControlFlow() {
         // #docregion control-flow
         if (year >= 2001) {
           print('21st century');
@@ -61,7 +64,7 @@ void main() {
           print('20th century');
         }
 
-        for (var object in flybyObjects) {
+        for (final object in flybyObjects) {
           print(object);
         }
 
@@ -76,7 +79,7 @@ void main() {
       }
 
       expect(
-          _test,
+          testControlFlow,
           m.prints(flatten([
             '20th century',
             flybyObjects,
@@ -85,13 +88,13 @@ void main() {
     });
 
     test('arrow', () {
-      _test() {
+      void testArrowFunction() {
         // #docregion arrow
         flybyObjects.where((name) => name.contains('turn')).forEach(print);
         // #enddocregion arrow
       }
 
-      expect(_test, m.prints('Saturn'));
+      expect(testArrowFunction, m.prints('Saturn'));
     });
   });
 
@@ -108,7 +111,7 @@ void main() {
   });
 
   test('use class', () {
-    _test1() {
+    void testUseClass() {
       // #docregion use-class
       var voyager = Spacecraft('Voyager I', DateTime(1977, 9, 5));
       voyager.describe();
@@ -116,7 +119,7 @@ void main() {
       // #enddocregion use-class
     }
 
-    _test2() {
+    void testNamedConstructor() {
       // #docregion use-class
       var voyager3 = Spacecraft.unlaunched('Voyager III');
       voyager3.describe();
@@ -124,17 +127,31 @@ void main() {
     }
 
     expect(
-        _test1,
+        testUseClass,
         prints(allOf(
           startsWith('Spacecraft: Voyager I'),
           contains('Launched: 1977'),
         )));
     expect(
-        _test2,
+        testNamedConstructor,
         m.prints([
           'Spacecraft: Voyager III',
           'Unlaunched',
         ]));
+  });
+
+  test('use enum', () {
+    void testIsGiant() {
+      // #docregion use-enum
+      final yourPlanet = Planet.earth;
+
+      if (!yourPlanet.isGiant) {
+        print('Your planet is not a "giant planet".');
+      }
+      // #enddocregion use-enum
+    }
+
+    expect(testIsGiant, m.prints('Your planet is not a "giant planet".'));
   });
 
   test('extends', () {
@@ -173,14 +190,14 @@ void main() {
   });
 
   test('Future.then', () {
-    // #docregion Future-then
+    // #docregion future-then
     Future<void> printWithDelay(String message) {
       return Future.delayed(oneSecond).then((_) {
         print(message);
       });
     }
 
-    // #enddocregion Future-then
+    // #enddocregion future-then
     expect(() => printWithDelay('Hi'), prints('Hi\n'));
   });
 
@@ -198,7 +215,7 @@ void main() {
     test('await', () {
       // #docregion await
       Future<void> createDescriptions(Iterable<String> objects) async {
-        for (var object in objects) {
+        for (final object in objects) {
           try {
             var file = File('$object.txt');
             if (await file.exists()) {
@@ -216,14 +233,14 @@ void main() {
       }
       // #enddocregion await
 
-      _test() async {
+      void testAwait() async {
         final objects = ['test_data/config', testFileBase];
         await createDescriptions(objects);
         expect(testFile.existsSync(), isTrue);
       }
 
       expect(
-          _test,
+          testAwait,
           prints(
             contains('File for test_data/config already exists.'),
           ));
@@ -234,14 +251,14 @@ void main() {
     var voyager = Spacecraft('Voyager I', DateTime(1977, 9, 5));
     var flybyObjects = ['Jupiter', 'Saturn', 'Uranus', 'Neptune'];
 
-    // #docregion async-
+    // #docregion async-star
     Stream<String> report(Spacecraft craft, Iterable<String> objects) async* {
-      for (var object in objects) {
+      for (final object in objects) {
         await Future.delayed(oneSecond);
         yield '${craft.name} flies by $object';
       }
     }
-    // #enddocregion async-
+    // #enddocregion async-star
 
     final messages = flybyObjects.map((o) => 'Voyager I flies by $o');
     expect(await report(voyager, flybyObjects).toList(), messages);
@@ -260,11 +277,11 @@ void main() {
   });
 
   test('try', () {
-    _test() async {
-      final flybyObjects = ['Moon'];
-      // #docregion try
+    final flybyObjects = ['Moon'];
+    // #docregion try
+    Future<void> describeFlybyObjects(List<String> flybyObjects) async {
       try {
-        for (var object in flybyObjects) {
+        for (final object in flybyObjects) {
           var description = await File('$object.txt').readAsString();
           print(description);
         }
@@ -273,9 +290,10 @@ void main() {
       } finally {
         flybyObjects.clear();
       }
-      // #enddocregion try
     }
+    // #enddocregion try
 
-    expect(_test, prints(startsWith('Could not describe object:')));
+    expect(() => describeFlybyObjects(flybyObjects),
+        prints(startsWith('Could not describe object:')));
   });
 }

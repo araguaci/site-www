@@ -1,14 +1,14 @@
-// ignore_for_file: annotate_overrides, type_annotate_public_apis, unused_element
+// ignore_for_file: annotate_overrides, unused_element, strict_raw_type
 // NOTE: Declarations in this file are analyzed but not tested.
-typedef Void1 = void Function(dynamic);
-typedef Async0 = Future Function();
 
 void futuresTutorial() {
-  Async0 expensiveA, expensiveB, expensiveC;
-  Void1 doSomethingWith;
+  Future<void> expensiveA() async {}
+  Future<void> expensiveB() async {}
+  Future<dynamic> expensiveC() async {}
+  void doSomethingWith(_) {}
   // #docregion multiple-await
   // Sequential processing using async and await.
-  main() async {
+  void main() async {
     await expensiveA();
     await expensiveB();
     doSomethingWith(await expensiveC());
@@ -21,61 +21,51 @@ void futuresTutorial() {
       .then((bValue) => expensiveC())
       .then((cValue) => doSomethingWith(cValue));
   // #enddocregion chaining
-
-  Void1 handleError;
-  void chooseBestResponse(List responses, bool anotherArg) => responses[0];
-  bool moreInfo = true;
-
-  // #docregion Future-wait
-  Future.wait([expensiveA(), expensiveB(), expensiveC()])
-      .then((List responses) => chooseBestResponse(responses, moreInfo))
-      .catchError(handleError);
-  // #enddocregion Future-wait
 }
 
 void streamsTutorial() {
-  // #docregion lastPositive
+  // #docregion last-positive
   Future<int> lastPositive(Stream<int> stream) =>
       stream.lastWhere((x) => x >= 0);
-  // #enddocregion lastPositive
+  // #enddocregion last-positive
 
   void log(e) {}
 
-  // #docregion mapLogErrors
+  // #docregion map-log-errors
   Stream<S> mapLogErrors<S, T>(
     Stream<T> stream,
     S Function(T event) convert,
   ) async* {
     var streamWithoutErrors = stream.handleError((e) => log(e));
-    await for (var event in streamWithoutErrors) {
+    await for (final event in streamWithoutErrors) {
       yield convert(event);
     }
   }
-  // #enddocregion mapLogErrors
+  // #enddocregion map-log-errors
 }
 
 abstract class MyStream<T> extends Stream<T> {
   // #docregion mock-stream-method-implementations
-  Future<bool> contains(Object needle) async {
-    await for (var event in this) {
+  Future<bool> contains(Object? needle) async {
+    await for (final event in this) {
       if (event == needle) return true;
     }
     return false;
   }
 
   Future forEach(void Function(T element) action) async {
-    await for (var event in this) {
+    await for (final event in this) {
       action(event);
     }
   }
 
   Future<List<T>> toList() async {
     final result = <T>[];
-    await this.forEach(result.add);
+    await forEach(result.add);
     return result;
   }
 
-  Future<String> join([String separator = ""]) async =>
-      (await this.toList()).join(separator);
+  Future<String> join([String separator = '']) async =>
+      (await toList()).join(separator);
   // #enddocregion mock-stream-method-implementations
 }

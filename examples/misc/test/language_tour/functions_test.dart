@@ -1,4 +1,5 @@
-// ignore_for_file: unused_element, type_annotate_public_apis
+// ignore_for_file: unused_element, type_annotate_public_apis, prefer_function_declarations_over_variables
+// ignore_for_file: always_declare_return_types
 import 'package:examples/language_tour/function_equality.dart'
     as function_equality;
 import 'package:test/test.dart';
@@ -7,7 +8,7 @@ import 'package:examples_util/print_matcher.dart' as m;
 void main() {
   test('optional-positional-parameters', () {
     // #docregion optional-positional-parameters
-    String say(String from, String msg, [String device]) {
+    String say(String from, String msg, [String? device]) {
       var result = '$from says $msg';
       if (device != null) {
         result = '$result with a $device';
@@ -27,26 +28,18 @@ void main() {
 
   test('optional-positional-param-default', () {
     // #docregion optional-positional-param-default
-    String say(String from, String msg,
-        [String device = 'carrier pigeon', String mood]) {
-      var result = '$from says $msg';
-      if (device != null) {
-        result = '$result with a $device';
-      }
-      if (mood != null) {
-        result = '$result (in a $mood mood)';
-      }
+    String say(String from, String msg, [String device = 'carrier pigeon']) {
+      var result = '$from says $msg with a $device';
       return result;
     }
 
-    assert(say('Bob', 'Howdy') ==
-        'Bob says Howdy with a carrier pigeon');
+    assert(say('Bob', 'Howdy') == 'Bob says Howdy with a carrier pigeon');
     // #enddocregion optional-positional-param-default
   });
 
   test('main-args', () {
     // #docregion main-args
-    // Run the app like this: dart args.dart 1 test
+    // Run the app like this: dart run args.dart 1 test
     void main(List<String> arguments) {
       print(arguments);
 
@@ -67,34 +60,43 @@ void main() {
     // #enddocregion function-as-var
   });
 
-  final indexedFruit = '''0: apples
-1: bananas
-2: oranges
+  const indexedFruit = '''APPLES: 6
+BANANAS: 7
+ORANGES: 7
 ''';
 
   test('anonymous-function', () {
-    _test() {
-      // #docregion anonymous-function
-      var list = ['apples', 'bananas', 'oranges'];
-      list.forEach((item) {
-        print('${list.indexOf(item)}: $item');
-      });
-      // #enddocregion anonymous-function
+    void testForEachAnonymousFunction() {
+      // #docregion anonymous-function-main
+      void main() {
+        // #docregion anonymous-function
+        const list = ['apples', 'bananas', 'oranges'];
+        list.map((item) {
+          return item.toUpperCase();
+        }).forEach((item) {
+          print('$item: ${item.length}');
+        });
+        // #enddocregion anonymous-function
+      }
+      // #enddocregion anonymous-function-main
+
+      main();
     }
 
-    expect(_test, prints(indexedFruit));
+    expect(testForEachAnonymousFunction, prints(indexedFruit));
   });
 
   test('anon-func', () {
-    _test() {
-      var list = ['apples', 'bananas', 'oranges'];
+    void testAnonymousFunction() {
+      const list = ['apples', 'bananas', 'oranges'];
       // #docregion anon-func
-      list.forEach(
-          (item) => print('${list.indexOf(item)}: $item'));
+      list
+          .map((item) => item.toUpperCase())
+          .forEach((item) => print('$item: ${item.length}'));
       // #enddocregion anon-func
     }
 
-    expect(_test, prints(indexedFruit));
+    expect(testAnonymousFunction, prints(indexedFruit));
   });
 
   test('nested-functions', () {

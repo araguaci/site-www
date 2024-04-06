@@ -1,4 +1,6 @@
-// ignore_for_file: type_annotate_public_apis, unused_element, unused_local_variable, sort_constructors_first
+// ignore_for_file: close_sinks, type_annotate_public_apis, unused_element
+// ignore_for_file: unused_local_variable, strict_raw_type, use_function_type_syntax_for_parameters
+// ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'dart:async';
 import 'dart:collection';
@@ -10,12 +12,35 @@ import 'package:examples_util/ellipsis.dart';
 typedef Func1<S, T> = S Function(T _);
 
 dynamic element, key, value;
-ByteBuffer bytes;
-DateTime dateTime;
-List list;
-Map map;
-String string;
-StreamSubscription subscription;
+ByteBuffer bytes = Int8List(0).buffer;
+DateTime dateTime = DateTime.now();
+List list = [];
+Map map = {};
+String string = '';
+StreamSubscription subscription = Stream.empty().listen((_) {});
+
+class BuildContext {}
+
+class Widget {}
+
+class Text extends Widget {
+  Text(String label);
+}
+
+class EdgeInsets {
+  static double all(double value) => value;
+}
+
+class Padding extends Widget {
+  Padding({required double padding, required Widget child});
+}
+
+class Key {}
+
+class StatelessWidget {
+  final Key? key;
+  StatelessWidget({this.key});
+}
 
 void miscDeclAnalyzedButNotTested() {
   (Iterable errors, Iterable<Monster> monsters) {
@@ -41,7 +66,7 @@ void miscDeclAnalyzedButNotTested() {
 
   (Queue queue, window, connection) {
     // #docregion verb-for-func-with-side-effect
-    list.add("element");
+    list.add('element');
     queue.removeFirst();
     window.refresh();
     // #enddocregion verb-for-func-with-side-effect
@@ -63,20 +88,20 @@ void miscDeclAnalyzedButNotTested() {
   };
 
   (stackTrace) {
-    // #docregion to___
+    // #docregion to-misc
     list.toSet();
     stackTrace.toString();
     dateTime.toLocal();
-    // #enddocregion to___
+    // #enddocregion to-misc
   };
 
   () {
     dynamic table;
-    // #docregion as___
+    // #docregion as-misc
     var map = table.asMap();
     var list = bytes.asFloat32List();
     var future = subscription.asFuture();
-    // #enddocregion as___
+    // #enddocregion as-misc
   };
 
   () {
@@ -158,10 +183,17 @@ void miscDeclAnalyzedButNotTested() {
   }
 
   {
+    // #docregion non-inferred-type-args
+    var playerScores = <String, int>{};
+    final events = StreamController<Event>();
+    // #enddocregion non-inferred-type-args
+  }
+
+  {
     // #docregion omit-types-on-locals
     List<List<Ingredient>> possibleDesserts(Set<Ingredient> pantry) {
       var desserts = <List<Ingredient>>[];
-      for (var recipe in cookbook) {
+      for (final recipe in cookbook) {
         if (pantry.containsAll(recipe)) {
           desserts.add(recipe);
         }
@@ -170,6 +202,38 @@ void miscDeclAnalyzedButNotTested() {
       return desserts;
     }
     // #enddocregion omit-types-on-locals
+  }
+
+  {
+    var applyPadding = true;
+
+    // #docregion upcast-local
+    Widget build(BuildContext context) {
+      Widget result = Text('You won!');
+      if (applyPadding) {
+        result = Padding(padding: EdgeInsets.all(8.0), child: result);
+      }
+      return result;
+    }
+    // #enddocregion upcast-local
+  }
+
+  {
+    // #docregion annotate-return-types
+    String makeGreeting(String who) {
+      return 'Hello, $who!';
+    }
+    // #enddocregion annotate-return-types
+  }
+
+  {
+    // #docregion annotate-parameters
+    void sayRepeatedly(String message, {int count = 2}) {
+      for (var i = 0; i < count; i++) {
+        print(message);
+      }
+    }
+    // #enddocregion annotate-parameters
   }
 
   (AstNode node) {
@@ -186,7 +250,7 @@ void miscDeclAnalyzedButNotTested() {
   // #docregion inferred-wrong
   num highScore(List<num> scores) {
     num highest = 0;
-    for (var score in scores) {
+    for (final score in scores) {
       if (score > highest) highest = score;
     }
     return highest;
@@ -194,15 +258,16 @@ void miscDeclAnalyzedButNotTested() {
   // #enddocregion inferred-wrong
 
   {
-    // #docregion redundant
-    Set<String> things = Set();
-    // #enddocregion redundant
+    // #docregion explicit
+    var items = Future.value([1, 2, 3]);
+    // #enddocregion explicit
   }
 
   {
-    // #docregion explicit
-    var things = Set<String>();
-    // #enddocregion explicit
+    // #docregion incomplete-generic
+    List<num> numbers = [1, 2, 3];
+    var completer = Completer<Map<String, int>>();
+    // #enddocregion incomplete-generic
   }
 
   {
@@ -211,9 +276,21 @@ void miscDeclAnalyzedButNotTested() {
     // #enddocregion prefer-dynamic
   }
 
-  // #docregion avoid-Function
+  {
+    // #docregion infer-dynamic
+    Map<String, dynamic> readJson() => ellipsis();
+
+    void printUsers() {
+      var json = readJson();
+      var users = json['users'];
+      print(users);
+    }
+    // #enddocregion infer-dynamic
+  }
+
+  // #docregion avoid-function
   bool isValid(String value, bool Function(String) test) => ellipsis();
-  // #enddocregion avoid-Function
+  // #enddocregion avoid-function
 
   // #docregion function-arity
   void handleError(void Function() operation, Function errorHandler) {
@@ -225,14 +302,14 @@ void miscDeclAnalyzedButNotTested() {
       } else if (errorHandler is Function(Object, StackTrace)) {
         errorHandler(err, stack);
       } else {
-        throw ArgumentError("errorHandler has wrong signature.");
+        throw ArgumentError('errorHandler has wrong signature.');
       }
     }
   }
   // #enddocregion function-arity
 
   () {
-    // #docregion Object-vs-dynamic
+    // #docregion object-vs-dynamic
     /// Returns a Boolean representation for [arg], which must
     /// be a String or bool.
     bool convertToBool(Object arg) {
@@ -240,7 +317,7 @@ void miscDeclAnalyzedButNotTested() {
       if (arg is String) return arg.toLowerCase() == 'true';
       throw ArgumentError('Cannot convert $arg to a bool.');
     }
-    // #enddocregion Object-vs-dynamic
+    // #enddocregion object-vs-dynamic
   };
 
   // #docregion future-or
@@ -250,7 +327,7 @@ void miscDeclAnalyzedButNotTested() {
   // #docregion future-or-contra
   Stream<S> asyncMap<T, S>(
       Iterable<T> iterable, FutureOr<S> Function(T) callback) async* {
-    for (var element in iterable) {
+    for (final element in iterable) {
       yield await callback(element);
     }
   }
@@ -272,6 +349,37 @@ void miscDeclAnalyzedButNotTested() {
   };
 }
 
+//----------------------------------------------------------------------------
+
+// #docregion dont-type-init-formals
+class Point1 {
+  double x, y;
+  Point1(this.x, this.y);
+}
+
+class MyWidget extends StatelessWidget {
+  MyWidget({super.key});
+}
+// #enddocregion dont-type-init-formals
+
+//----------------------------------------------------------------------------
+
+// #docregion inferred-type-args
+class Downloader {
+  final Completer<String> response = Completer();
+}
+// #enddocregion inferred-type-args
+
+//----------------------------------------------------------------------------
+
+// #docregion redundant
+class Downloader1 {
+  final Completer<String> response = Completer();
+}
+// #enddocregion redundant
+
+//----------------------------------------------------------------------------
+
 class MyIterable<T> {
   // #docregion function-type-param
   Iterable<T> where(bool Function(T) predicate) => ellipsis();
@@ -287,11 +395,11 @@ class FilteredObservable {
 
   FilteredObservable(this._predicate, this._observers);
 
-  void Function(Event) notify(Event event) {
+  void Function(Event)? notify(Event event) {
     if (!_predicate(event)) return null;
 
-    void Function(Event) last;
-    for (var observer in _observers) {
+    void Function(Event)? last;
+    for (final observer in _observers) {
       observer(event);
       last = observer;
     }
@@ -317,11 +425,11 @@ typedef Comparison2<T> = int Function(T a, T b);
 class AstNode {}
 
 class Constructor extends AstNode {
-  List<AstNode> get signature => null;
+  List<AstNode> get signature => [];
 }
 
 class Method extends AstNode {
-  List<AstNode> get parameters => null;
+  List<AstNode> get parameters => [];
 }
 
 class Socket {
@@ -333,17 +441,17 @@ class Socket {
 class Database {
   bool get hasData => false;
   bool get isEmpty => false;
-  String read() => null;
+  String read() => '';
 }
 
 class Monster {
-  bool hasClaws;
+  bool hasClaws = false;
 }
 
-List<Person> people;
+List<Person> people = [];
 
 class ListBox {
-  ListBox({bool scroll, bool showScrollbars});
+  ListBox({required bool scroll, required bool showScrollbars});
 }
 
 class Button {
@@ -359,7 +467,7 @@ class Task {
 
 class Ingredient {}
 
-final List<List<Ingredient>> cookbook = null;
+final List<List<Ingredient>> cookbook = [];
 
 //----------------------------------------------------------------------------
 
@@ -415,27 +523,6 @@ class Graph1<Node, Edge> {
 
 //----------------------------------------------------------------------------
 
-class Control {}
-
-// #docregion mixin
-mixin ClickableMixin implements Control {
-  bool _isDown = false;
-
-  void click();
-
-  void mouseDown() {
-    _isDown = true;
-  }
-
-  void mouseUp() {
-    if (_isDown) click();
-    _isDown = false;
-  }
-}
-// #enddocregion mixin
-
-//----------------------------------------------------------------------------
-
 // #docregion one-member-abstract-class
 typedef Predicate<E> = bool Function(E element);
 // #enddocregion one-member-abstract-class
@@ -452,7 +539,7 @@ class C<Foo> {
 
 class String0 {
   // #docregion omit-optional-positional
-  String0.fromCharCodes(Iterable<int> charCodes, [int start = 0, int end]);
+  String0.fromCharCodes(Iterable<int> charCodes, [int start = 0, int? end]);
 
   // #enddocregion omit-optional-positional
 }
@@ -490,10 +577,10 @@ class Duration0 {
 class Person {
   final String name;
   // #enddocregion eq-dont-check-for-null
+  int get hashCode => name.hashCode;
   Person(this.name);
   // #docregion eq-dont-check-for-null
-  bool operator ==(other) => other is Person && name == other.name;
 
-  int get hashCode => name.hashCode;
+  bool operator ==(Object other) => other is Person && name == other.name;
 }
 // #enddocregion eq-dont-check-for-null

@@ -27,7 +27,7 @@ void main() {
     ''';
     expect(
         () => Future.wait([
-              Future.delayed(Duration(seconds: 4)),
+              Future.delayed(const Duration(seconds: 4)),
               Future.sync(futures_intro.main),
             ]),
         m.printsLines(output));
@@ -50,6 +50,10 @@ void main() {
   });
 
   test('try_catch', () {
-    expect(try_catch.main, m.prints('Caught error: Cannot locate user order'));
+    final output = '''
+      Awaiting user order...
+      Caught error: Cannot locate user order
+    ''';
+    expect(try_catch.main, m.printsLines(output));
   });
 }

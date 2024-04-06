@@ -1,31 +1,35 @@
-// ignore_for_file: sort_constructors_first
-// #docregion class-with-distanceTo
+// #docregion class-with-distance-to
 import 'dart:math';
 
-// #docregion constructor-initializer, named-constructor
+// #enddocregion class-with-distance-to
+// #docregion named-constructor
+const double xOrigin = 0;
+const double yOrigin = 0;
+
+// #docregion class-with-distance-to, constructor-initializer
 class Point {
-  double x, y;
+  final double x;
+  final double y;
 
-  // #enddocregion class-with-distanceTo, named-constructor
-  // Syntactic sugar for setting x and y
+  // Sets the x and y instance variables
   // before the constructor body runs.
-  // #docregion class-with-distanceTo, named-constructor
+  // #docregion class-with-distance-to, named-constructor
   Point(this.x, this.y);
-  // #enddocregion class-with-distanceTo, constructor-initializer
+  // #enddocregion class-with-distance-to, constructor-initializer
 
+  // #docregion named-constructor
   // Named constructor
-  Point.origin() {
-    x = 0;
-    y = 0;
-  }
+  Point.origin()
+      : x = xOrigin,
+        y = yOrigin;
   // #enddocregion named-constructor
 
   // Initializer list sets instance variables before
   // the constructor body runs.
   Point.fromJson(Map<String, double> json)
-      : x = json['x'],
-        y = json['y'];
-  // #docregion class-with-distanceTo
+      : x = json['x']!,
+        y = json['y']!;
+  // #docregion class-with-distance-to
 
   double distanceTo(Point other) {
     var dx = x - other.x;
@@ -34,3 +38,4 @@ class Point {
   }
   // #docregion constructor-initializer, named-constructor
 }
+// #enddocregion class-with-distance-to, constructor-initializer, named-constructor

@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code, prefer_if_null_operators
+
 import 'package:test/test.dart';
 import 'package:examples/language_tour/classes/employee.dart' as employee;
 import 'package:examples_util/print_matcher.dart' as m;
@@ -46,14 +48,15 @@ void main() {
 
   test('increment-decrement', () {
     // #docregion increment-decrement
-    var a, b;
+    int a;
+    int b;
 
     a = 0;
     b = ++a; // Increment a before b gets its value.
     assert(a == b); // 1 == 1
 
     a = 0;
-    b = a++; // Increment a AFTER b gets its value.
+    b = a++; // Increment a after b gets its value.
     assert(a != b); // 1 != 0
 
     a = 0;
@@ -61,7 +64,7 @@ void main() {
     assert(a == b); // -1 == -1
 
     a = 0;
-    b = a--; // Decrement a AFTER b gets its value.
+    b = a--; // Decrement a after b gets its value.
     assert(a != b); // -1 != 0
     // #enddocregion increment-decrement
   });
@@ -78,12 +81,13 @@ void main() {
   });
 
   test('is-vs-as', () {
-    expect(employee.main, m.prints(['in Person', 'in Employee']));
+    expect(employee.main,
+        m.prints(['in Person', 'in Employee', "Instance of 'Employee'"]));
   });
 
   group('`=` vs `??=`:', () {
     // #docregion assignment-gist-main-body
-    void assignValues(int a, int b, int value) {
+    void assignValues(int? a, int? b, int value) {
       print('Initially: a == $a, b == $b');
       // #docregion assignment
       // Assign value to a
@@ -101,13 +105,13 @@ void main() {
     // #enddocregion assignment-gist-main-body
     */
 
-    _test001() {
+    void testInitiallyNonNull() {
       // #docregion assignment-gist-main-body
       assignValues(0, 0, 1);
       // #enddocregion assignment-gist-main-body
     }
 
-    _testNull() {
+    void testNull() {
       // #docregion assignment-gist-main-body
       assignValues(null, null, 1);
       // #enddocregion assignment-gist-main-body
@@ -115,7 +119,7 @@ void main() {
 
     test('var initially non-null', () {
       expect(
-          _test001,
+          testInitiallyNonNull,
           m.prints([
             'Initially: a == 0, b == 0',
             'After: a == 1, b == 0',
@@ -124,7 +128,7 @@ void main() {
 
     test('var initially non-null', () {
       expect(
-          _testNull,
+          testNull,
           m.prints([
             'Initially: a == null, b == null',
             'After: a == 1, b == 1',
@@ -155,22 +159,30 @@ void main() {
     assert((value & ~bitmask) == 0x20); // AND NOT
     assert((value | bitmask) == 0x2f); // OR
     assert((value ^ bitmask) == 0x2d); // XOR
+
     assert((value << 4) == 0x220); // Shift left
     assert((value >> 4) == 0x02); // Shift right
+
+    // Shift right example that results in different behavior on web
+    // because the operand value changes when masked to 32 bits:
+    assert((-value >> 4) == -0x03);
+
+    assert((value >>> 4) == 0x02); // Unsigned shift right
+    assert((-value >>> 4) > 0); // Unsigned shift right
     // #enddocregion op-bitwise
-  });
+  }, testOn: 'vm');
 
   test('if-null', () {
     // #docregion if-null
-    String playerName1(String name) => name ?? 'Guest';
+    String playerName1(String? name) => name ?? 'Guest';
     // #enddocregion if-null
 
     // #docregion if-null-alt
     // Slightly longer version uses ?: operator.
-    String playerName2(String name) => name != null ? name : 'Guest';
+    String playerName2(String? name) => name != null ? name : 'Guest';
 
     // Very long version uses if-else statement.
-    String playerName3(String name) {
+    String playerName3(String? name) {
       if (name != null) {
         return name;
       } else {

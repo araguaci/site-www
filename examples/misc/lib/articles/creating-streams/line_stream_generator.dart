@@ -9,11 +9,11 @@ Stream<String> lines(Stream<String> source) async* {
   // Stores any partial line from the previous chunk.
   var partial = '';
   // Wait until a new chunk is available, then process it.
-  await for (var chunk in source) {
+  await for (final chunk in source) {
     var lines = chunk.split('\n');
     lines[0] = partial + lines[0]; // Prepend partial line.
     partial = lines.removeLast(); // Remove new partial line.
-    for (var line in lines) {
+    for (final line in lines) {
       yield line; // Add lines to output stream.
     }
   }
@@ -23,17 +23,17 @@ Stream<String> lines(Stream<String> source) async* {
 // #enddocregion split-into-lines
 
 void main() {
-  var part1 = '''
+  const part1 = '''
 Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
 doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
 veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
 ipsam voluptatem quia voluptas sit ''';
-  var part2 = '''
+  const part2 = '''
 aspernatur aut odit aut fugit, sed quia
 consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
 Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur,
 adipisci velit, sed quia non numquam eius modi tempora ''';
-  var part3 = '''
+  const part3 = '''
 incidunt ut labore et
 dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis
 nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid

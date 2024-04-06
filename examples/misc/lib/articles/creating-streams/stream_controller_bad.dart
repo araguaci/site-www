@@ -4,7 +4,7 @@ import 'dart:async';
 // #docregion flawed-stream
 // NOTE: This implementation is FLAWED!
 // It starts before it has subscribers, and it doesn't implement pause.
-Stream<int> timedCounter(Duration interval, [int maxCount]) {
+Stream<int> timedCounter(Duration interval, [int? maxCount]) {
   var controller = StreamController<int>();
   int counter = 0;
   void tick(Timer timer) {
@@ -40,7 +40,7 @@ void listenAfterDelay() async {
   await Future.delayed(const Duration(seconds: 5));
 
   // After 5 seconds, add a listener.
-  await for (int n in counterStream) {
+  await for (final n in counterStream) {
     print(n); // Print an integer every second, 15 times.
   }
 }
@@ -49,7 +49,7 @@ void listenAfterDelay() async {
 // #docregion pause-problem
 void listenWithPause() {
   var counterStream = timedCounter(const Duration(seconds: 1), 15);
-  StreamSubscription<int> subscription;
+  late StreamSubscription<int> subscription;
 
   subscription = counterStream.listen((int counter) {
     print(counter); // Print an integer every second.

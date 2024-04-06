@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html>
-  {% include head.html %}
+<html lang="en">
+  {% include 'head.html' %}
   <body class="homepage">
-    {% include gtags.html %}
-    {% include page-header.html %}
-    {% include navigation-side.html %}
+    {% include 'cookie-notice.html' %}
+    {% include 'gtags.html' %}
+    {% include 'page-header.html' %}
+    {% include 'navigation-side.html' %}
     <main id="page-content">
-      {{ content }}
+      {{content}}
     </main>
-    {% include page-footer.html %}
+    {% include 'page-footer.html' %}
   </body>
 </html>

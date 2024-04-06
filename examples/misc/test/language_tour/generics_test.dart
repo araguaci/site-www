@@ -1,4 +1,4 @@
-// ignore_for_file: argument_type_not_assignable
+// ignore_for_file: argument_type_not_assignable, prefer_collection_literals
 import 'package:examples/language_tour/generics/base_class.dart';
 import 'package:test/test.dart';
 
@@ -6,7 +6,7 @@ final Matcher throwsATypeError = throwsA(TypeMatcher<TypeError>());
 
 void main() {
   test('constructor-1', () {
-    var names = List<String>();
+    var names = <String>[];
     names.addAll(['Seth', 'Kathy', 'Lars']);
     // #docregion constructor-1
     var nameSet = Set<String>.from(names);
@@ -22,15 +22,16 @@ void main() {
   });
 
   test('generic-collections', () {
-    _test() {
+    void testGenericCollection() {
       // #docregion generic-collections
-      var names = List<String>();
+      var names = <String>[];
       names.addAll(['Seth', 'Kathy', 'Lars']);
+      // ignore: unnecessary_type_check
       print(names is List<String>); // true
       // #enddocregion generic-collections
     }
 
-    expect(_test, prints('true\n'));
+    expect(testGenericCollection, prints('true\n'));
   });
 
   test('method', () {

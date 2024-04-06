@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_single_quotes, prefer_typing_uninitialized_variables, prefer_adjacent_string_concatenation, avoid_init_to_null
+
 import 'package:test/test.dart';
 
 void main() {
@@ -24,8 +26,8 @@ void main() {
   test('bit-shifting', () {
     // #docregion bit-shifting
     assert((3 << 1) == 6); // 0011 << 1 == 0110
-    assert((3 >> 1) == 1); // 0011 >> 1 == 0001
     assert((3 | 4) == 7); // 0011 | 0100 == 0111
+    assert((3 & 4) == 0); // 0011 & 0100 == 0000
     // #enddocregion bit-shifting
   });
 
@@ -34,11 +36,11 @@ void main() {
     var s = 'string interpolation';
 
     assert('Dart has $s, which is very handy.' ==
-        'Dart has string interpolation, ' +
+        'Dart has string interpolation, '
             'which is very handy.');
-    assert('That deserves all caps. ' +
+    assert('That deserves all caps. '
             '${s.toUpperCase()} is very handy!' ==
-        'That deserves all caps. ' +
+        'That deserves all caps. '
             'STRING INTERPOLATION is very handy!');
     // #enddocregion string-interpolation
   });
@@ -68,7 +70,7 @@ void main() {
     assert(hitPoints <= 0);
 
     // Check for null.
-    var unicorn;
+    var unicorn = null;
     assert(unicorn == null);
 
     // Check for NaN.
@@ -97,45 +99,31 @@ void main() {
   });
 
   test('list-null-spread', () {
+    List<int>? list;
     // #docregion list-null-spread
-    var list;
     var list2 = [0, ...?list];
     assert(list2.length == 1);
     // #enddocregion list-null-spread
   });
 
   test('list-if', () {
-    var promoActive = false;
+    var promoActive = true;
     // #docregion list-if
-    var nav = [
-      'Home',
-      'Furniture',
-      'Plants',
-      if (promoActive) 'Outlet'
-    ];
+    var nav = ['Home', 'Furniture', 'Plants', if (promoActive) 'Outlet'];
     // #enddocregion list-if
-    assert(nav.length == 3);
+    assert(nav.length == 4);
   });
 
   test('list-for', () {
     // #docregion list-for
     var listOfInts = [1, 2, 3];
-    var listOfStrings = [
-      '#0',
-      for (var i in listOfInts) '#$i'
-    ];
+    var listOfStrings = ['#0', for (var i in listOfInts) '#$i'];
     assert(listOfStrings[1] == '#1');
     // #enddocregion list-for
   });
 
   test('set-length', () {
-    var halogens = {
-      'fluorine',
-      'chlorine',
-      'bromine',
-      'iodine',
-      'astatine'
-    };
+    var halogens = {'fluorine', 'chlorine', 'bromine', 'iodine', 'astatine'};
 
     // #docregion set-length
     var elements = <String>{};

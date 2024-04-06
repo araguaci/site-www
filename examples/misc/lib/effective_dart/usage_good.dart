@@ -1,4 +1,7 @@
-// ignore_for_file: type_annotate_public_apis, unused_element, unused_local_variable, sort_constructors_first
+// ignore_for_file: type_annotate_public_apis, unused_element, unused_local_variable
+// ignore_for_file: prefer_function_declarations_over_variables, strict_raw_type,
+// ignore_for_file: prefer_initializing_formals, prefer_typing_uninitialized_variables
+// ignore_for_file: use_super_parameters, dead_code
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
@@ -6,27 +9,40 @@ import 'dart:math';
 typedef Func0<T> = T Function();
 typedef Func1<S, T> = S Function(T _);
 
-Func0<Future> longRunningCalculation;
-Func0 somethingRisky;
-Func1 raiseAlarm, handle;
-Func1<bool, dynamic> canHandle, verifyResult;
+Func0<Future<void>> longRunningCalculation = () => Future.value();
+Func0 somethingRisky = () {};
+Func1 raiseAlarm = (_) {}, handle = (_) {};
+Func1<bool, dynamic> canHandle = (_) => false, verifyResult = (_) => false;
+T? somethingNullable<T>() => null;
+
+class Thing {
+  bool get isEnabled => true;
+}
 
 void miscDeclAnalyzedButNotTested() {
   {
-    dynamic optionalThing;
-    // #docregion convert-null-aware
-    // If you want null to be false:
-    optionalThing?.isEnabled ?? false;
+    bool nonNullableBool = true;
+    bool? nullableBool = somethingNullable<bool>();
 
-    // If you want null to be true:
-    optionalThing?.isEnabled ?? true;
-    // #enddocregion convert-null-aware
+    // #docregion non-null-boolean-expression
+    if (nonNullableBool) {/* ... */}
+
+    if (!nonNullableBool) {/* ... */}
+    // #enddocregion non-null-boolean-expression
+
+    // #docregion nullable-boolean-expression
+    // If you want null to result in false:
+    if (nullableBool ?? false) {/* ... */}
+
+    // If you want null to result in false
+    // and you want the variable to type promote:
+    if (nullableBool != null && nullableBool) {/* ... */}
+    // #enddocregion nullable-boolean-expression
   }
 
   {
     // #docregion adjacent-strings-literals
-    raiseAlarm(
-        'ERROR: Parts of the spaceship are on fire. Other '
+    raiseAlarm('ERROR: Parts of the spaceship are on fire. Other '
         'parts are overrun by martians. Unclear which are which.');
     // #enddocregion adjacent-strings-literals
   }
@@ -38,13 +54,9 @@ void miscDeclAnalyzedButNotTested() {
   };
 
   (name, decade) {
-    return
-        // #docregion string-interpolation-avoid-curly
-        'Hi, $name!'
-            "Wear your wildest $decade's outfit."
-            'Wear your wildest ${decade}s outfit.'
-        // #enddocregion string-interpolation-avoid-curly
-        ;
+    // #docregion string-interpolation-avoid-curly
+    var greeting = 'Hi, $name! I love your ${decade}s costume.';
+    // #enddocregion string-interpolation-avoid-curly
   };
 
   {
@@ -53,6 +65,25 @@ void miscDeclAnalyzedButNotTested() {
     var addresses = <String, Address>{};
     var counts = <int>{};
     // #enddocregion collection-literals
+  }
+
+  {
+    var command = 'c';
+    var options = ['a'];
+    // ignore: unnecessary_cast
+    var modeFlags = ['b'] as List<String>?;
+    var filePaths = ['p'];
+    String removeExtension(String path) => path;
+
+    // #docregion spread-etc
+    var arguments = [
+      ...options,
+      command,
+      ...?modeFlags,
+      for (var path in filePaths)
+        if (path.endsWith('.dart')) path.replaceAll('.dart', '.js')
+    ];
+    // #enddocregion spread-etc
   }
 
   (Iterable lunchBox, Iterable words) {
@@ -88,7 +119,7 @@ void miscDeclAnalyzedButNotTested() {
   // #docregion cast-iterate
   void printEvens(List<Object> objects) {
     // We happen to know the list only contains ints.
-    for (var n in objects) {
+    for (final n in objects) {
       if ((n as int).isEven) print(n);
     }
   }
@@ -103,20 +134,12 @@ void miscDeclAnalyzedButNotTested() {
   }
   // #enddocregion cast-from
 
-  (Iterable<Animal> animals) {
-    // #docregion use-higher-order-func
-    var aquaticNames = animals
-        .where((animal) => animal.isAquatic)
-        .map((animal) => animal.name);
-    // #enddocregion use-higher-order-func
-  };
-
   (Iterable people) {
-    // #docregion avoid-forEach
-    for (var person in people) {
+    // #docregion avoid-for-each
+    for (final person in people) {
       /*...*/
     }
-    // #enddocregion avoid-forEach
+    // #enddocregion avoid-for-each
     // #docregion forEach-over-func
     people.forEach(print);
     // #enddocregion forEach-over-func
@@ -125,7 +148,7 @@ void miscDeclAnalyzedButNotTested() {
   {
     // #docregion func-decl
     void main() {
-      localFunction() {
+      void localFunction() {
         /*...*/
       }
     }
@@ -134,7 +157,20 @@ void miscDeclAnalyzedButNotTested() {
 
   (Iterable names) {
     // #docregion use-tear-off
-    names.forEach(print);
+    var charCodes = [68, 97, 114, 116];
+    var buffer = StringBuffer();
+
+    // Function:
+    charCodes.forEach(print);
+
+    // Method:
+    charCodes.forEach(buffer.write);
+
+    // Named constructor:
+    var strings = charCodes.map(String.fromCharCode);
+
+    // Unnamed constructor:
+    var buffers = charCodes.map(StringBuffer.new);
     // #enddocregion use-tear-off
   };
 
@@ -146,10 +182,23 @@ void miscDeclAnalyzedButNotTested() {
 
   {
     // #docregion default-value-null
-    void error([String message]) {
+    void error([String? message]) {
       stderr.write(message ?? '\n');
     }
     // #enddocregion default-value-null
+  }
+
+  {
+    // #docregion null-aware-promote
+    int measureMessage(String? message) {
+      if (message != null && message.isNotEmpty) {
+        // message is promoted to String.
+        return message.length;
+      }
+
+      return 0;
+    }
+    // #enddocregion null-aware-promote
   }
 
   {
@@ -165,9 +214,8 @@ void miscDeclAnalyzedButNotTested() {
 
   {
     // #docregion unnecessary-async
-    Future<void> afterTwoThings(
-        Future<void> first, Future<void> second) {
-      return Future.wait([first, second]);
+    Future<int> fastestBranch(Future<int> left, Future<int> right) {
+      return Future.any([left, right]);
     }
     // #enddocregion unnecessary-async
   }
@@ -183,7 +231,7 @@ void miscDeclAnalyzedButNotTested() {
       throw 'Error!';
     }
 
-    Future<void> asyncValue() async => 'value';
+    Future<String> asyncValue() async => 'value';
     // #enddocregion async
   }
 
@@ -205,7 +253,7 @@ void miscDeclAnalyzedButNotTested() {
       return result;
     } else {
       print(value);
-      return value as T;
+      return value;
     }
   }
   // #enddocregion test-future-or
@@ -222,9 +270,9 @@ void miscDeclAnalyzedButNotTested() {
   {
     // #docregion no-const
     const primaryColors = [
-      Color("red", [255, 0, 0]),
-      Color("green", [0, 255, 0]),
-      Color("blue", [0, 0, 255]),
+      Color('red', [255, 0, 0]),
+      Color('green', [0, 255, 0]),
+      Color('blue', [0, 0, 255]),
     ];
     // #enddocregion no-const
   }
@@ -235,12 +283,12 @@ void miscDeclAnalyzedButNotTested() {
 class Address {}
 
 class Animal {
-  String name;
-  bool isAquatic;
+  String name = '';
+  bool isAquatic = false;
 }
 
 class Person {
-  int zip;
+  int zip = 12345;
 }
 
 class Color {
@@ -254,8 +302,8 @@ class Player {
 }
 
 class Team {
-  Future<List<Player>> get roster => null;
-  Future<Team> downloadTeam(String name) => null;
+  Future<List<Player>> get roster => Future.value([]);
+  Future<Team?> downloadTeam(String name) => Future.value(Team());
   dynamic get log => null;
 
   // #docregion async-await
@@ -276,24 +324,54 @@ class Team {
 
 //----------------------------------------------------------------------------
 
+class Item {
+  int get price => 0;
+}
+
 // #docregion no-null-init
-int _nextId;
+Item? bestDeal(List<Item> cart) {
+  Item? bestItem;
 
-class LazyId {
-  int _id;
-
-  int get id {
-    if (_nextId == null) _nextId = 0;
-    if (_id == null) _id = _nextId++;
-
-    return _id;
+  for (final item in cart) {
+    if (bestItem == null || item.price < bestItem.price) {
+      bestItem = item;
+    }
   }
+
+  return bestItem;
 }
 // #enddocregion no-null-init
 
 //----------------------------------------------------------------------------
 
-// #docregion cacl-vs-store
+class Response {
+  String get url => '';
+  String get errorCode => '';
+  String get reason => '';
+}
+
+// #docregion shadow-nullable-field
+class UploadException {
+  final Response? response;
+
+  UploadException([this.response]);
+
+  @override
+  String toString() {
+    final response = this.response;
+    if (response != null) {
+      return 'Could not complete upload to ${response.url} '
+          '(error code ${response.errorCode}): ${response.reason}.';
+    }
+
+    return 'Could not upload (no response).';
+  }
+}
+// #enddocregion shadow-nullable-field
+
+//----------------------------------------------------------------------------
+
+// #docregion calc-vs-store
 class Circle {
   double radius;
 
@@ -302,13 +380,13 @@ class Circle {
   double get area => pi * radius * radius;
   double get circumference => pi * 2.0 * radius;
 }
-// #enddocregion cacl-vs-store
+// #enddocregion calc-vs-store
 
 //----------------------------------------------------------------------------
 
 // #docregion dont-wrap-field
 class Box {
-  var contents;
+  Object? contents;
 }
 // #enddocregion dont-wrap-field
 
@@ -323,7 +401,7 @@ class Box1 {
 //----------------------------------------------------------------------------
 
 class Chest {
-  List<String> get contents => null;
+  List<String> get contents => [];
 }
 
 class Treasure {
@@ -333,15 +411,12 @@ class Treasure {
 }
 
 class C {
-  double left, right, top, bottom, minTime;
-  Point center;
-  Map<Chest, Treasure> _opened;
+  double left = 0.0, right = 0.0, top = 0.0, bottom = 0.0, minTime = 0.0;
+  Point center = Point(0.0, 0.0);
+  final Map<Chest, Treasure> _opened = {};
 
   // #docregion use-arrow
   double get area => (right - left) * (bottom - top);
-
-  bool isReady(double time) =>
-      minTime == null || minTime <= time;
 
   String capitalize(String name) =>
       '${name[0].toUpperCase()}${name.substring(1)}';
@@ -353,7 +428,7 @@ class C {
   // #enddocregion arrow-setter
 
   // #docregion arrow-long
-  Treasure openChest(Chest chest, Point where) {
+  Treasure? openChest(Chest chest, Point where) {
     if (_opened.containsKey(chest)) return null;
 
     var treasure = Treasure(where);
@@ -368,13 +443,13 @@ class C {
 
 // #docregion this-dot
 class Box2 {
-  var value;
+  Object? value;
 
   void clear() {
     update(null);
   }
 
-  void update(value) {
+  void update(Object? value) {
     this.value = value;
   }
 }
@@ -403,9 +478,9 @@ class BaseBox {
 
 // #docregion param-dont-shadow-field-ctr-init
 class Box3 extends BaseBox {
-  var value;
+  Object? value;
 
-  Box3(value)
+  Box3(Object? value)
       : value = value,
         super(value);
 }
@@ -416,12 +491,12 @@ class Box3 extends BaseBox {
 class Document {}
 
 // #docregion field-init-at-decl
-class Folder {
+class ProfileMark {
   final String name;
-  final List<Document> contents = [];
+  final DateTime start = DateTime.now();
 
-  Folder(this.name);
-  Folder.temp() : name = 'temporary';
+  ProfileMark(this.name);
+  ProfileMark.unnamed() : name = '';
 }
 // #enddocregion field-init-at-decl
 
@@ -436,12 +511,14 @@ class Point0 {
 
 //----------------------------------------------------------------------------
 
-// #docregion dont-type-init-formals
+// #docregion late-init-list
 class Point1 {
   double x, y;
-  Point1(this.x, this.y);
+  Point1.polar(double theta, double radius)
+      : x = cos(theta) * radius,
+        y = sin(theta) * radius;
 }
-// #enddocregion dont-type-init-formals
+// #enddocregion late-init-list
 
 //----------------------------------------------------------------------------
 
@@ -480,21 +557,3 @@ Widget build(BuildContext context) {
   );
 }
 // #enddocregion no-new
-
-//----------------------------------------------------------------------------
-
-class Style {}
-
-class ViewBase {
-  ViewBase(_);
-}
-
-class View extends ViewBase {
-  var _children;
-  // #docregion super-first
-  View(Style style, List children)
-      : _children = children,
-        super(style);
-  // #enddocregion super-first
-  get children => _children;
-}

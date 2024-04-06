@@ -1,5 +1,7 @@
 @Tags(['browser'])
 @TestOn('browser')
+library;
+
 import 'dart:async';
 import 'dart:html';
 import 'package:test/test.dart';
@@ -11,7 +13,7 @@ void main() {
         // #docregion anchor-html
         '<a id="example" href="/another/example">link text</a>';
     // #enddocregion anchor-html
-    document.body.appendHtml(html);
+    document.body!.appendHtml(html);
 
     // #docregion href
     var anchor = querySelector('#example') as AnchorElement;
@@ -25,23 +27,23 @@ void main() {
 
   test('querySelectorAll', () {
     // #docregion os-html
-    final html = '''<!-- In HTML: -->
+    const html = '''<!-- In HTML: -->
     <p>
       <span class="linux">Words for Linux</span>
       <span class="macos">Words for Mac</span>
       <span class="windows">Words for Windows</span>
     </p>''';
     // #enddocregion os-html
-    document.body.appendHtml(html);
+    document.body!.appendHtml(html);
 
     String determineUserOs() => 'linux';
     // #docregion os
     // In Dart:
-    final osList = ['macos', 'windows', 'linux'];
+    const osList = ['macos', 'windows', 'linux'];
     final userOs = determineUserOs();
 
     // For each possible OS...
-    for (var os in osList) {
+    for (final os in osList) {
       // Matches user OS?
       bool shouldShow = (os == userOs);
 
@@ -49,38 +51,38 @@ void main() {
       // os == 'windows', call querySelectorAll('.windows')
       // to find all elements with the class "windows".
       // Note that '.$os' uses string interpolation.
-      for (var elem in querySelectorAll('.$os')) {
+      for (final elem in querySelectorAll('.$os')) {
         elem.hidden = !shouldShow; // Show or hide.
       }
     }
     // #enddocregion os
-    expect(querySelector('.linux').hidden, isFalse);
-    expect(querySelector('.macos').hidden, isTrue);
-    expect(querySelector('.windows').hidden, isTrue);
+    expect(querySelector('.linux')!.hidden, isFalse);
+    expect(querySelector('.macos')!.hidden, isTrue);
+    expect(querySelector('.windows')!.hidden, isTrue);
   });
 
-  test('getString', () async {
+  test('getString', skip: 'httpbin timing out', () async {
     final url = 'https://httpbin.org';
-    // #docregion getString
-    Future main() async {
+    // #docregion get-string
+    Future<void> main() async {
       String pageHtml = await HttpRequest.getString(url);
       // Do something with pageHtml...
-      // #enddocregion getString
+      // #enddocregion get-string
       expect(
         pageHtml.substring(0, 250),
         contains('<title>httpbin'),
       );
-      // #docregion getString
+      // #docregion get-string
     }
-    // #enddocregion getString
+    // #enddocregion get-string
 
     await main();
   });
 
-  test('request', () async {
+  test('request', skip: 'httpbin timing out', () async {
     final url = 'https://httpbin.org/headers';
     // #docregion request
-    Future main() async {
+    Future<void> main() async {
       HttpRequest req = await HttpRequest.request(
         url,
         method: 'HEAD',
@@ -97,15 +99,16 @@ void main() {
     await main();
   });
 
-  test('POST', () async {
-    final url = 'https://httpbin.org/post';
+  test('POST', skip: 'httpbin timing out', () async {
+    const url = 'https://httpbin.org/post';
     // #docregion POST
-    String encodeMap(Map<String, String> data) => data.keys
-        .map((k) => '${Uri.encodeComponent(k)}=${Uri.encodeComponent(data[k])}')
+    String encodeMap(Map<String, String> data) => data.entries
+        .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
         .join('&');
 
-    Future main() async {
-      var data = {'dart': 'fun', 'angular': 'productive'};
+    void main() async {
+      const data = {'dart': 'fun', 'angular': 'productive'};
 
       var request = HttpRequest();
       request
@@ -143,7 +146,7 @@ void main() {
     void initWebSocket([int retrySeconds = 1]) {
       var reconnectScheduled = false;
 
-      print("Connecting to websocket");
+      print('Connecting to websocket');
 
       void scheduleReconnect() {
         if (!reconnectScheduled) {
@@ -161,12 +164,12 @@ void main() {
       });
 
       ws.onClose.listen((e) {
-        print('Websocket closed, retrying in ' + '$retrySeconds seconds');
+        print('Websocket closed, retrying in $retrySeconds seconds');
         scheduleReconnect();
       });
 
       ws.onError.listen((e) {
-        print("Error connecting to ws");
+        print('Error connecting to ws');
         scheduleReconnect();
       });
 
@@ -182,7 +185,7 @@ void main() {
     // #enddocregion initWebSocket
 
     final t = wsStream.stream.timeout(
-      Duration(seconds: 5),
+      const Duration(seconds: 5),
       onTimeout: (s) => s.add('Timeout!'),
     );
 

@@ -1,29 +1,22 @@
-// ignore_for_file: sort_constructors_first, unrelated_type_equality_checks
+// ignore_for_file: unrelated_type_equality_checks
 // #docregion
 class Person {
   final String firstName, lastName;
 
   Person(this.firstName, this.lastName);
 
-  // Override hashCode using strategy from Effective Java,
-  // Chapter 11.
+  // Override hashCode using the static hashing methods
+  // provided by the `Object` class.
   @override
-  int get hashCode {
-    int result = 17;
-    result = 37 * result + firstName.hashCode;
-    result = 37 * result + lastName.hashCode;
-    return result;
-  }
+  int get hashCode => Object.hash(firstName, lastName);
 
-  // You should generally implement operator == if you
-  // override hashCode.
+  // You should generally implement operator `==` if you
+  // override `hashCode`.
   @override
-  bool operator ==(dynamic other) {
-    if (other is! Person) return false;
-    // ignore: stable, dev, invalid_assignment, // https://github.com/dart-lang/sdk/issues/32236
-    Person person = other;
-    return (person.firstName == firstName &&
-        person.lastName == lastName);
+  bool operator ==(Object other) {
+    return other is Person &&
+        other.firstName == firstName &&
+        other.lastName == lastName;
   }
 }
 

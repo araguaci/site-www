@@ -1,4 +1,4 @@
-// ignore_for_file: unused_element, type_annotate_public_apis
+// ignore_for_file: unused_element, type_annotate_public_apis, strict_raw_type
 // #docregion import
 import 'dart:async';
 // #enddocregion import
@@ -6,35 +6,33 @@ import 'dart:async';
 void miscDeclAnalyzedButNotTested() {
   final args = <String>[];
   Future<String> findEntryPoint() async => 'entrypoint';
-  Future<int> runExecutable(
-          String entryPoint, List<String> args) async =>
-      0;
+  Future<int> runExecutable(String entryPoint, List<String> args) async => 0;
   Future<int> flushThenExit(int exitCode) async => 0;
 
   {
-    // #docregion runUsingFuture
-    runUsingFuture() {
+    // #docregion run-using-future
+    void runUsingFuture() {
       // ...
       findEntryPoint().then((entryPoint) {
         return runExecutable(entryPoint, args);
       }).then(flushThenExit);
     }
-    // #enddocregion runUsingFuture
+    // #enddocregion run-using-future
   }
 
   {
-    // #docregion runUsingAsyncAwait
-    runUsingAsyncAwait() async {
+    // #docregion run-using-async-await
+    Future<void> runUsingAsyncAwait() async {
       // ...
       var entryPoint = await findEntryPoint();
       var exitCode = await runExecutable(entryPoint, args);
       await flushThenExit(exitCode);
     }
-    // #enddocregion runUsingAsyncAwait
+    // #enddocregion run-using-async-await
   }
 
   {
-    Future catchExample() async {
+    Future<void> catchExample() async {
       // #docregion catch
       var entryPoint = await findEntryPoint();
       try {
@@ -48,12 +46,12 @@ void miscDeclAnalyzedButNotTested() {
   }
 
   final url = 'humans.txt';
-  Future costlyQuery(String url) async {}
-  Future expensiveWork(dynamic value) async {}
-  Future lengthyComputation() async {}
+  Future<dynamic> costlyQuery(String url) async {}
+  Future<void> expensiveWork(dynamic value) async {}
+  Future<void> lengthyComputation() async {}
 
   {
-    Future f() {
+    Future<void> f() {
       // #docregion then-chain
       Future result = costlyQuery(url);
       result
@@ -64,12 +62,12 @@ void miscDeclAnalyzedButNotTested() {
         /* Handle exception... */
       });
       // #enddocregion then-chain
-      return null;
+      return Future.value();
     }
   }
 
   {
-    Future f() async {
+    Future<void> f() async {
       // #docregion then-chain-as-await
       try {
         final value = await costlyQuery(url);
@@ -85,11 +83,11 @@ void miscDeclAnalyzedButNotTested() {
 
   bool elideBody = true;
   {
-    Future f() async {
+    Future<void> f() async {
       // #docregion wait
-      Future deleteLotsOfFiles() async => elideBody;
-      Future copyLotsOfFiles() async => elideBody;
-      Future checksumLotsOfOtherFiles() async => elideBody;
+      Future<void> deleteLotsOfFiles() async => elideBody;
+      Future<void> copyLotsOfFiles() async => elideBody;
+      Future<void> checksumLotsOfOtherFiles() async => elideBody;
 
       await Future.wait([
         deleteLotsOfFiles(),

@@ -1,4 +1,5 @@
-// ignore_for_file: unused_local_variable, type_annotate_public_apis
+// ignore_for_file: dead_code, unused_local_variable, type_annotate_public_apis
+// ignore_for_file: prefer_single_quotes, prefer_collection_literals
 
 void miscDeclAnalyzedButNotTested() {
   {
@@ -13,6 +14,13 @@ void miscDeclAnalyzedButNotTested() {
     var y = 1.1;
     var exponents = 1.42e5;
     // #enddocregion double-literals
+  }
+
+  {
+    // #docregion declare-num
+    num x = 1; // x can have both int and double values
+    x += 2.5;
+    // #enddocregion declare-num
   }
 
   {
@@ -87,9 +95,19 @@ void miscDeclAnalyzedButNotTested() {
   }
 
   {
+    // #docregion trailing-commas
+    var list = [
+      'Car',
+      'Boat',
+      'Plane',
+    ];
+    // #enddocregion trailing-commas
+  }
+
+  {
     // #docregion const-list
     var constantList = const [1, 2, 3];
-    // constantList[1] = 1; // Uncommenting this causes an error.
+    // constantList[1] = 1; // This line will cause an error.
     // #enddocregion const-list
   }
 
@@ -120,7 +138,7 @@ void miscDeclAnalyzedButNotTested() {
       'iodine',
       'astatine',
     };
-    // constantSet.add('helium'); // Uncommenting this causes an error.
+    // constantSet.add('helium'); // This line will cause an error.
     // #enddocregion const-set
   }
 
@@ -143,12 +161,12 @@ void miscDeclAnalyzedButNotTested() {
 
   {
     // #docregion map-constructor
-    var gifts = Map();
+    var gifts = Map<String, String>();
     gifts['first'] = 'partridge';
     gifts['second'] = 'turtledoves';
     gifts['fifth'] = 'golden rings';
 
-    var nobleGases = Map();
+    var nobleGases = Map<int, String>();
     nobleGases[2] = 'helium';
     nobleGases[10] = 'neon';
     nobleGases[18] = 'argon';
@@ -170,7 +188,7 @@ void miscDeclAnalyzedButNotTested() {
       18: 'argon',
     };
 
-    // constantMap[2] = 'Helium'; // Uncommenting this causes an error.
+    // constantMap[2] = 'Helium'; // This line will cause an error.
     // #enddocregion const-map
   }
 }
@@ -185,20 +203,12 @@ var s2 = """This is also a
 multi-line string.""";
 // #enddocregion triple-quotes
 
+// MOVE TO library tour?
 class SymbolExampleNotUsedYet {
   // #docregion symbols
-  // MOVE TO library tour?
-
   void main() {
     print(Function.apply(int.parse, ['11']));
     print(Function.apply(int.parse, ['11'], {#radix: 16}));
-    print(Function.apply(int.parse, ['11a'], {#onError: handleError}));
-    print(Function.apply(
-        int.parse, ['11a'], {#radix: 16, #onError: handleError}));
   }
-
-  int handleError(String source) {
-    return 0;
-  }
-// #enddocregion symbols
+  // #enddocregion symbols
 }

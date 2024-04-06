@@ -1,10 +1,10 @@
-// ignore_for_file: unnecessary_cast, sort_constructors_first
+// ignore_for_file: unnecessary_cast, strict_raw_type
 
-Map get defaultData => {}; // stub
+Map fetchDefaultData() => {}; // stub
 
-// #docregion
+// #docregion super
 class Person {
-  String firstName;
+  String? firstName;
 
   Person.fromJson(Map data) {
     print('in Person');
@@ -13,13 +13,13 @@ class Person {
 
 // #docregion method-then-constructor
 class Employee extends Person {
-  // #enddocregion ''
-  Employee() : super.fromJson(defaultData);
+  // #enddocregion super
+  Employee() : super.fromJson(fetchDefaultData());
   // #enddocregion method-then-constructor
-  // #docregion
+  // #docregion super
   // Person does not have a default constructor;
-  // you must call super.fromJson(data).
-  Employee.fromJson(Map data) : super.fromJson(data) {
+  // you must call super.fromJson().
+  Employee.fromJson(super.data) : super.fromJson() {
     print('in Employee');
   }
 // #docregion method-then-constructor
@@ -27,18 +27,23 @@ class Employee extends Person {
 // #enddocregion method-then-constructor
 
 void main() {
-  var emp = Employee.fromJson({});
+  var employee = Employee.fromJson({});
+  print(employee);
   // Prints:
   // in Person
   // in Employee
-
-  // #docregion emp-is-Person
-  if (emp is Person) {
+  // Instance of 'Employee'
+  // #enddocregion super
+  // #docregion emp-is-person
+  // ignore: unnecessary_type_check
+  if (employee is Person) {
     // Type check
-    emp.firstName = 'Bob';
+    employee.firstName = 'Bob';
   }
-  // #enddocregion emp-is-Person
-  // #docregion emp-as-Person
-  (emp as Person).firstName = 'Bob';
-  // #enddocregion emp-as-Person
+  // #enddocregion emp-is-person
+  // #docregion emp-as-person
+  (employee as Person).firstName = 'Bob';
+  // #enddocregion emp-as-person
+// #docregion super
 }
+// #enddocregion super

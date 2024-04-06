@@ -5,7 +5,7 @@ import 'dart:math';
 void miscDeclAnalyzedButNotTested() {
   {
     // #docregion misc-names
-    var item;
+    var count = 3;
 
     HttpRequest httpRequest;
 
@@ -72,7 +72,7 @@ const anArg = null;
 
 // #docregion annotation-type-names
 class Foo {
-  const Foo([arg]);
+  const Foo([Object? arg]);
 }
 
 @Foo(anArg)
@@ -102,6 +102,17 @@ class Dice {
   static final numberGenerator = Random();
 }
 // #enddocregion const-names
+
+//----------------------------------------------------------------------------
+
+void unusedCallbackParams() {
+  var futureOfVoid = Future<void>.value();
+  // #docregion unused-callback-params
+  futureOfVoid.then((_) {
+    print('Operation complete.');
+  });
+  // #enddocregion unused-callback-params
+}
 
 //----------------------------------------------------------------------------
 

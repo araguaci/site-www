@@ -15,11 +15,7 @@ void miscDeclAnalyzedButNotTested() {
       FileSystemEntity.isDirectory(searchPath).then((isDir) {
         if (isDir) {
           final startingDir = Directory(searchPath);
-          startingDir
-              .list(
-                  recursive: argResults[recursive],
-                  followLinks: argResults[followLinks])
-              .listen((entity) {
+          startingDir.list().listen((entity) {
             if (entity is File) {
               searchFile(entity, searchTerms);
             }
@@ -34,13 +30,11 @@ void miscDeclAnalyzedButNotTested() {
 
   {
     // #docregion await-for
-    Future main(List<String> arguments) async {
+    void main(List<String> arguments) async {
       // ...
       if (await FileSystemEntity.isDirectory(searchPath)) {
         final startingDir = Directory(searchPath);
-        await for (var entity in startingDir.list(
-            recursive: argResults[recursive],
-            followLinks: argResults[followLinks])) {
+        await for (final entity in startingDir.list()) {
           if (entity is File) {
             searchFile(entity, searchTerms);
           }
@@ -53,18 +47,17 @@ void miscDeclAnalyzedButNotTested() {
   }
 
   {
-    // #docregion readFileAwaitFor
-    Future readFileAwaitFor() async {
+    // #docregion read-file-await-for
+    Future<void> readFileAwaitFor() async {
       var config = File('config.txt');
       Stream<List<int>> inputStream = config.openRead();
 
       // #docregion transform
-      var lines = inputStream
-          .transform(utf8.decoder)
-          .transform(LineSplitter());
+      var lines =
+          inputStream.transform(utf8.decoder).transform(const LineSplitter());
       // #enddocregion transform
       try {
-        await for (var line in lines) {
+        await for (final line in lines) {
           print('Got ${line.length} characters from stream');
         }
         print('file is now closed');
@@ -72,24 +65,22 @@ void miscDeclAnalyzedButNotTested() {
         print(e);
       }
     }
-    // #enddocregion readFileAwaitFor
+    // #enddocregion read-file-await-for
   }
 
   {
-    // #docregion onDone
+    // #docregion on-done
     var config = File('config.txt');
     Stream<List<int>> inputStream = config.openRead();
 
-    inputStream
-        .transform(utf8.decoder)
-        .transform(LineSplitter())
-        .listen((String line) {
+    inputStream.transform(utf8.decoder).transform(const LineSplitter()).listen(
+        (String line) {
       print('Got ${line.length} characters from stream');
     }, onDone: () {
       print('file is now closed');
     }, onError: (e) {
       print(e);
     });
-    // #enddocregion onDone
+    // #enddocregion on-done
   }
 }

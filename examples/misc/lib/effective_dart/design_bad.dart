@@ -1,10 +1,20 @@
-// ignore_for_file: type_annotate_public_apis, unused_element, unused_local_variable, avoid_types_as_parameter_names, sort_constructors_first, unused_field
+// ignore_for_file: close_sinks, type_annotate_public_apis, unused_element, unused_local_variable, avoid_types_as_parameter_names
+// ignore_for_file: type_init_formals, unused_field, always_declare_return_types, strict_raw_type, prefer_typing_uninitialized_variables
+// ignore_for_file: use_function_type_syntax_for_parameters, prefer_generic_function_type_aliases, avoid_null_checks_in_equality_operators
+// ignore_for_file: non_nullable_equals_parameter
 
 import 'dart:async';
 
 import 'package:examples_util/ellipsis.dart';
 
 import 'design_good.dart';
+
+class Key {}
+
+class StatelessWidget {
+  final Key? key;
+  StatelessWidget({this.key});
+}
 
 void miscDeclAnalyzedButNotTested() {
   (errors, monsters, subscription) {
@@ -19,7 +29,7 @@ void miscDeclAnalyzedButNotTested() {
     monsters.filter((monster) => monster.hasClaws);
     // #enddocregion code-like-prose
 
-    Iterable theCollectionOfErrors;
+    Iterable theCollectionOfErrors = [];
     // #docregion code-like-prose-overdone
     if (theCollectionOfErrors.isEmpty) {/*-...-*/}
 
@@ -60,7 +70,7 @@ void miscDeclAnalyzedButNotTested() {
     // #docregion omit-types-on-locals
     List<List<Ingredient>> possibleDesserts(Set<Ingredient> pantry) {
       List<List<Ingredient>> desserts = <List<Ingredient>>[];
-      for (List<Ingredient> recipe in cookbook) {
+      for (final List<Ingredient> recipe in cookbook) {
         if (pantry.containsAll(recipe)) {
           desserts.add(recipe);
         }
@@ -72,15 +82,54 @@ void miscDeclAnalyzedButNotTested() {
   }
 
   {
-    // #docregion redundant
-    Set<String> things = Set<String>();
-    // #enddocregion redundant
+    // #docregion annotate-return-types
+    makeGreeting(String who) {
+      return 'Hello, $who!';
+    }
+    // #enddocregion annotate-return-types
+  }
+
+  {
+    // Hack. The `(count as num)` is replaced with `count` when the excerpt is
+    // included to workaround no implicit casts in the examples.
+    // #docregion annotate-parameters
+    void sayRepeatedly(message, {count = 2}) {
+      for (var i = 0; i < (count as num); i++) {
+        print(message);
+      }
+    }
+    // #enddocregion annotate-parameters
+  }
+
+  (AstNode node) {
+    // #docregion uninitialized-local
+    var parameters;
+    if (node is Constructor) {
+      parameters = node.signature;
+    } else if (node is Method) {
+      parameters = node.parameters;
+    }
+    // #enddocregion uninitialized-local
+  };
+
+  {
+    // #docregion non-inferred-type-args
+    var playerScores = {};
+    final events = StreamController();
+    // #enddocregion non-inferred-type-args
   }
 
   {
     // #docregion explicit
-    var things = Set();
+    var items = Future<List<int>>.value(<int>[1, 2, 3]);
     // #enddocregion explicit
+  }
+
+  {
+    // #docregion incomplete-generic
+    List numbers = [1, 2, 3];
+    var completer = Completer<Map>();
+    // #enddocregion incomplete-generic
   }
 
   {
@@ -89,14 +138,14 @@ void miscDeclAnalyzedButNotTested() {
     // #enddocregion prefer-dynamic
   }
 
-  // #docregion avoid-Function
+  // #docregion avoid-function
   bool isValid(String value, Function test) => ellipsis();
-  // #enddocregion avoid-Function
+  // #enddocregion avoid-function
 
   // #docregion future-or
   FutureOr<int> triple(FutureOr<int> value) {
     if (value is int) return value * 3;
-    return (value as Future<int>).then((v) => v * 3);
+    return value.then((v) => v * 3);
   }
   // #enddocregion future-or
 
@@ -115,6 +164,35 @@ class MyIterable<T> {
 
 //----------------------------------------------------------------------------
 
+// #docregion dont-type-init-formals
+class Point1 {
+  double x, y;
+  Point1(double this.x, double this.y);
+}
+
+class MyWidget extends StatelessWidget {
+  MyWidget({Key? super.key});
+}
+// #enddocregion dont-type-init-formals
+
+//----------------------------------------------------------------------------
+
+// #docregion inferred-type-args
+class Downloader {
+  final response = Completer();
+}
+// #enddocregion inferred-type-args
+
+//----------------------------------------------------------------------------
+
+// #docregion redundant
+class Downloader1 {
+  final Completer<String> response = Completer<String>();
+}
+// #enddocregion redundant
+
+//----------------------------------------------------------------------------
+
 // #docregion old-typedef
 typedef int Comparison<T>(T a, T b);
 // #enddocregion old-typedef
@@ -126,7 +204,7 @@ typedef bool TestNumber(num);
 //----------------------------------------------------------------------------
 
 class StringBuffer0 {
-  StringBuffer0 write(dynamic _) => null;
+  StringBuffer0 write(dynamic _) => this;
 }
 
 //----------------------------------------------------------------------------
@@ -182,7 +260,10 @@ class Person1 {
   // #enddocregion eq-dont-check-for-null
   Person1(this.name);
   int get hashCode => ellipsis();
+  // ignore_for_file: unnecessary_null_comparison
   // #docregion eq-dont-check-for-null
-  bool operator ==(other) => other != null && ellipsis<bool>();
+
+  bool operator ==(Object? other) =>
+      other != null && other is Person && name == other.name;
 }
 // #enddocregion eq-dont-check-for-null
